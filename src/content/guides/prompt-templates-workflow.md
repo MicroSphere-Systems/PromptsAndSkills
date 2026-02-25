@@ -97,7 +97,7 @@ After 3-5 iterations, most templates stabilize and produce consistently good res
 
 ## Tools for Managing Templates
 
-- **This site** — Browse and copy templates from [Prompts](/prompts/)
+- **This site** — Browse and copy templates from [Prompts](/PromptsAndSkills/prompts/)
 - **Markdown files in a repo** — Version control for your templates
 - **Snippet managers** — Tools like Raycast, Alfred, or TextExpander for quick access
 - **Custom CLI tool** — Build a simple script that fills template variables from command line args

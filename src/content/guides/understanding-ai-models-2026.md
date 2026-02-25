@@ -69,6 +69,6 @@ Ask these questions:
 
 Pick one model and build something small. Don't spend weeks comparing — the best way to learn which model works for your use case is to try it. Start with:
 
-1. [Your First Claude Project](/guides/your-first-claude-project/) — Build something with Claude in 30 minutes
-2. [Prompt Engineering Basics](/skills/prompt-engineering-basics/) — Learn to write better prompts for any model
-3. [Getting Started with AI Coding](/guides/getting-started-with-ai-coding/) — Use AI to write code faster
+1. [Your First Claude Project](/PromptsAndSkills/guides/your-first-claude-project/) — Build something with Claude in 30 minutes
+2. [Prompt Engineering Basics](/PromptsAndSkills/skills/prompt-engineering-basics/) — Learn to write better prompts for any model
+3. [Getting Started with AI Coding](/PromptsAndSkills/guides/getting-started-with-ai-coding/) — Use AI to write code faster

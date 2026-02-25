@@ -51,4 +51,4 @@ Present suggestions ordered by priority (HIGH first).
 
 ## Pair With
 
-Combine with the [Code Review Prompt](/prompts/code-review-prompt/) for a complete code quality workflow: review first to find issues, then refactor to fix them.
+Combine with the [Code Review Prompt](/PromptsAndSkills/prompts/code-review-prompt/) for a complete code quality workflow: review first to find issues, then refactor to fix them.

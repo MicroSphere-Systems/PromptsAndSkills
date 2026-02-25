@@ -7,6 +7,7 @@ import ContentCard from '../../components/ContentCard.astro';
 const CATEGORY = 'agents';
 const CATEGORY_LABEL = 'Agents';
 const CATEGORY_DESC = 'AI agent patterns, architectures, and configurations.';
+const base = import.meta.env.BASE_URL;
 
 export const getStaticPaths = (async ({ paginate }) => {
   let entries = [];
@@ -41,7 +42,7 @@ const latestEntries = allEntries
   <main class="listing container section">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <ol>
-        <li><a href="/">Home</a></li>
+        <li><a href={base}>Home</a></li>
         <li aria-current="page">{CATEGORY_LABEL}</li>
       </ol>
     </nav>
@@ -113,7 +114,7 @@ const latestEntries = allEntries
                 <ul class="latest-list">
                   {latestEntries.map((entry) => (
                     <li>
-                      <a href={`/${CATEGORY}/${entry.slug}/`} class="latest-list__link">
+                      <a href={`${base}${CATEGORY}/${entry.slug}/`} class="latest-list__link">
                         <span class="latest-list__title">{entry.data.title}</span>
                         <time class="latest-list__date" datetime={entry.data.date.toISOString()}>
                           {entry.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -163,7 +164,7 @@ const latestEntries = allEntries
         <p class="empty-state__desc">
           Content is being added regularly. Check back soon for new {CATEGORY_LABEL.toLowerCase()}.
         </p>
-        <a href="/" class="empty-state__link">Back to Home</a>
+        <a href={base} class="empty-state__link">Back to Home</a>
       </div>
     )}
   </main>

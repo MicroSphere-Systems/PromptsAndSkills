@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { currentSlug, category, tags } = Astro.props;
+const base = import.meta.env.BASE_URL;
 
 const allItems = await getCollection(category);
 const related = allItems
@@ -39,7 +40,7 @@ const difficultyColors: Record<string, string> = {
     <h2>Related {categoryLabels[category]}</h2>
     <div class="related-grid">
       {related.map((item) => (
-        <a href={`/${category}/${item.slug}/`} class="related-card">
+        <a href={`${base}${category}/${item.slug}/`} class="related-card">
           <span
             class="related-difficulty"
             style={`color: ${difficultyColors[item.data.difficulty]}`}

@@ -27,6 +27,7 @@ const dateFormatted = entry.data.date.toLocaleDateString('en-US', {
 });
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
@@ -42,8 +43,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
   <main class="container detail-page">
     <Breadcrumb
       items={[
-        { label: 'Home', href: '/' },
-        { label: 'Skills', href: '/skills/' },
+        { label: 'Home', href: base },
+        { label: 'Skills', href: `${base}skills/` },
         { label: entry.data.title },
       ]}
     />
