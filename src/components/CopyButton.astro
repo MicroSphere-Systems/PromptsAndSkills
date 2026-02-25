@@ -1,0 +1,99 @@
+---
+interface Props {
+  content: string;
+}
+
+const { content } = Astro.props;
+---
+
+<copy-button class="copy-btn" data-content={content}>
+  <button type="button" aria-label="Copy to clipboard">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+    <span class="copy-label">Copy</span>
+  </button>
+</copy-button>
+
+<script>
+  class CopyButtonElement extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector('button')!;
+      const label = this.querySelector('.copy-label')!;
+      const content = this.dataset.content || '';
+
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(content);
+          label.textContent = 'Copied!';
+          this.classList.add('copied');
+          setTimeout(() => {
+            label.textContent = 'Copy';
+            this.classList.remove('copied');
+          }, 2000);
+        } catch {
+          label.textContent = 'Failed';
+          setTimeout(() => {
+            label.textContent = 'Copy';
+          }, 2000);
+        }
+      });
+    }
+  }
+
+  customElements.define('copy-button', CopyButtonElement);
+</script>
+
+<style>
+  .copy-btn {
+    position: fixed;
+    bottom: var(--space-8);
+    right: var(--space-8);
+    z-index: 50;
+  }
+
+  .copy-btn button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    box-shadow: var(--shadow-glow);
+    transition:
+      background var(--transition-fast),
+      border-color var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .copy-btn button:hover {
+    background: color-mix(in srgb, var(--color-surface) 80%, var(--color-primary));
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+  }
+
+  .copy-btn.copied button {
+    border-color: var(--color-primary);
+    animation: pulse-glow 0.3s ease;
+  }
+
+  @keyframes pulse-glow {
+    0% { box-shadow: var(--shadow-glow); }
+    50% { box-shadow: 0 0 30px color-mix(in srgb, var(--color-primary) 50%, transparent); }
+    100% { box-shadow: var(--shadow-glow); }
+  }
+
+  @media (max-width: 640px) {
+    .copy-btn {
+      bottom: var(--space-4);
+      right: var(--space-4);
+    }
+  }
+</style>

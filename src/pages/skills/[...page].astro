@@ -1,0 +1,545 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+
+const CATEGORY = 'skills';
+const CATEGORY_LABEL = 'Skills';
+const CATEGORY_DESC = 'Technical AI skills and implementation patterns.';
+const PAGE_SIZE = 12;
+
+export const getStaticPaths = (async ({ paginate }) => {
+  let entries = [];
+  try {
+    entries = await getCollection('skills');
+  } catch {
+    entries = [];
+  }
+  entries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return paginate(entries, { pageSize: 12 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+
+const allEntries = page.data.length > 0 ? await getCollection(CATEGORY) : [];
+const tagCounts = new Map<string, number>();
+for (const entry of allEntries) {
+  for (const tag of entry.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  }
+}
+const popularTags = [...tagCounts.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 15);
+
+const latestEntries = allEntries
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 5);
+---
+
+<BaseLayout title={CATEGORY_LABEL} description={CATEGORY_DESC}>
+  <main class="listing container section">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-current="page">{CATEGORY_LABEL}</li>
+      </ol>
+    </nav>
+
+    <h1 class="listing__title">{CATEGORY_LABEL}</h1>
+    <p class="listing__desc">{CATEGORY_DESC}</p>
+
+    {page.data.length > 0 ? (
+      <>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filter-controls">
+            Filters
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="filter-controls" id="filter-controls">
+            <div class="filter-group">
+              <span class="filter-label">Difficulty</span>
+              <div class="filter-buttons" role="group" aria-label="Filter by difficulty">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="beginner">Beginner</button>
+                <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+                <button class="filter-btn" data-filter="advanced">Advanced</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <span class="filter-label">Sort</span>
+              <div class="filter-buttons" role="group" aria-label="Sort order">
+                <button class="filter-btn active" data-sort="newest">Newest</button>
+                <button class="filter-btn" data-sort="oldest">Oldest</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="listing__layout">
+          <div class="card-grid" id="card-grid">
+            {page.data.map((entry) => (
+              <ContentCard
+                title={entry.data.title}
+                description={entry.data.description}
+                slug={entry.slug}
+                category={CATEGORY}
+                tags={entry.data.tags}
+                difficulty={entry.data.difficulty}
+                date={entry.data.date}
+              />
+            ))}
+          </div>
+
+          <aside class="sidebar">
+            {popularTags.length > 0 && (
+              <div class="sidebar__section">
+                <h4 class="sidebar__heading">Popular Tags</h4>
+                <div class="tag-cloud">
+                  {popularTags.map(([tag, count]) => (
+                    <span class="tag-cloud__item">
+                      {tag} <span class="tag-cloud__count">{count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {latestEntries.length > 0 && (
+              <div class="sidebar__section">
+                <h4 class="sidebar__heading">Latest Additions</h4>
+                <ul class="latest-list">
+                  {latestEntries.map((entry) => (
+                    <li>
+                      <a href={`/${CATEGORY}/${entry.slug}/`} class="latest-list__link">
+                        <span class="latest-list__title">{entry.data.title}</span>
+                        <time class="latest-list__date" datetime={entry.data.date.toISOString()}>
+                          {entry.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </time>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div class="sidebar__section sidebar__ad">
+              <div class="ad-placeholder">
+                <span>Ad Space</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        {page.lastPage > 1 && (
+          <nav class="pagination" aria-label="Pagination">
+            {page.url.prev ? (
+              <a href={page.url.prev} class="pagination__link">Previous</a>
+            ) : (
+              <span class="pagination__link pagination__link--disabled">Previous</span>
+            )}
+            <span class="pagination__info">
+              Page {page.currentPage} of {page.lastPage}
+            </span>
+            {page.url.next ? (
+              <a href={page.url.next} class="pagination__link">Next</a>
+            ) : (
+              <span class="pagination__link pagination__link--disabled">Next</span>
+            )}
+          </nav>
+        )}
+      </>
+    ) : (
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <rect x="6" y="10" width="36" height="28" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M6 18h36M18 18v20" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <h2 class="empty-state__title">No {CATEGORY_LABEL.toLowerCase()} yet</h2>
+        <p class="empty-state__desc">
+          Content is being added regularly. Check back soon for new {CATEGORY_LABEL.toLowerCase()}.
+        </p>
+        <a href="/" class="empty-state__link">Back to Home</a>
+      </div>
+    )}
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const filterBtns = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+      const sortBtns = document.querySelectorAll<HTMLButtonElement>('[data-sort]');
+      const grid = document.getElementById('card-grid');
+      const toggle = document.getElementById('filter-toggle');
+      const controls = document.getElementById('filter-controls');
+
+      if (!grid) return;
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          const cards = grid.querySelectorAll<HTMLElement>('.content-card');
+          cards.forEach(card => {
+            if (filter === 'all' || card.dataset.difficulty === filter) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      sortBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          sortBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const direction = btn.dataset.sort;
+          const cards = [...grid.querySelectorAll<HTMLElement>('.content-card')];
+          cards.sort((a, b) => {
+            const dateA = new Date(a.querySelector('time')?.getAttribute('datetime') || 0).getTime();
+            const dateB = new Date(b.querySelector('time')?.getAttribute('datetime') || 0).getTime();
+            return direction === 'newest' ? dateB - dateA : dateA - dateB;
+          });
+          cards.forEach(card => grid.appendChild(card));
+        });
+      });
+
+      if (toggle && controls) {
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          controls.classList.toggle('filter-controls--open');
+        });
+      }
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .breadcrumb ol {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+
+    & li:not(:last-child)::after {
+      content: '>';
+      margin-left: var(--space-2);
+      color: var(--color-text-secondary);
+    }
+
+    & a {
+      color: var(--color-primary);
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  .listing__title {
+    margin-bottom: var(--space-2);
+  }
+
+  .listing__desc {
+    margin-bottom: var(--space-8);
+  }
+
+  .filter-bar {
+    margin-bottom: var(--space-8);
+  }
+
+  .filter-toggle {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    width: 100%;
+    justify-content: center;
+
+    & svg {
+      transition: transform var(--transition-fast);
+    }
+
+    &[aria-expanded="true"] svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  .filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    align-items: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .filter-label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .filter-btn {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-text);
+    }
+
+    &.active {
+      background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  .listing__layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-4));
+  }
+
+  .sidebar__section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .sidebar__heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .tag-cloud__item {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .tag-cloud__count {
+    font-size: 0.65rem;
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .latest-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .latest-list__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+    }
+  }
+
+  .latest-list__title {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  .latest-list__date {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .ad-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    opacity: 0.5;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  .pagination__link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    transition: all var(--transition-fast);
+
+    &:hover:not(.pagination__link--disabled) {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  .pagination__link--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .pagination__info {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-24) var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .empty-state__icon {
+    color: var(--color-text-secondary);
+    opacity: 0.4;
+  }
+
+  .empty-state__title {
+    font-size: var(--text-2xl);
+  }
+
+  .empty-state__desc {
+    color: var(--color-text-secondary);
+    max-width: 40ch;
+  }
+
+  .empty-state__link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-primary);
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .listing__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      position: static;
+    }
+
+    .filter-toggle {
+      display: flex;
+    }
+
+    .filter-controls {
+      display: none;
+      margin-top: var(--space-2);
+
+      &.filter-controls--open {
+        display: flex;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    .filter-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filter-group {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

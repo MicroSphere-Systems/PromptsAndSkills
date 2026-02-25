@@ -1,0 +1,131 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  currentSlug: string;
+  category: 'prompts' | 'skills' | 'agents' | 'guides' | 'enterprise';
+  tags: string[];
+}
+
+const { currentSlug, category, tags } = Astro.props;
+
+const allItems = await getCollection(category);
+const related = allItems
+  .filter((item) => item.slug !== currentSlug)
+  .map((item) => ({
+    ...item,
+    matchCount: item.data.tags.filter((t: string) => tags.includes(t)).length,
+  }))
+  .sort((a, b) => b.matchCount - a.matchCount)
+  .slice(0, 4);
+
+const categoryLabels: Record<string, string> = {
+  prompts: 'Prompts',
+  skills: 'Skills',
+  agents: 'Agents',
+  guides: 'Guides',
+  enterprise: 'Enterprise',
+};
+
+const difficultyColors: Record<string, string> = {
+  beginner: 'var(--color-beginner)',
+  intermediate: 'var(--color-intermediate)',
+  advanced: 'var(--color-advanced)',
+};
+---
+
+{related.length > 0 && (
+  <section class="related-content">
+    <h2>Related {categoryLabels[category]}</h2>
+    <div class="related-grid">
+      {related.map((item) => (
+        <a href={`/${category}/${item.slug}/`} class="related-card">
+          <span
+            class="related-difficulty"
+            style={`color: ${difficultyColors[item.data.difficulty]}`}
+          >
+            {item.data.difficulty}
+          </span>
+          <h3>{item.data.title}</h3>
+          <p>{item.data.description}</p>
+          <div class="related-tags">
+            {item.data.tags.slice(0, 3).map((tag: string) => (
+              <span class="tag-chip-sm">{tag}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-content {
+    padding-block: var(--space-12);
+  }
+
+  .related-content h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-6);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition:
+      box-shadow var(--transition-base),
+      transform var(--transition-base);
+  }
+
+  .related-card:hover {
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.02);
+  }
+
+  .related-card h3 {
+    font-size: var(--text-lg);
+    line-height: 1.3;
+  }
+
+  .related-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .related-difficulty {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .related-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: auto;
+  }
+
+  .tag-chip-sm {
+    font-size: var(--text-xs);
+    padding: 0.1em 0.5em;
+    background: color-mix(in srgb, var(--color-secondary) 20%, transparent);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-full);
+  }
+</style>

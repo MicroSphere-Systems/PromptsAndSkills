@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="Learn about Prompts & Skills — your resource for AI prompts, skills, agents, guides, and enterprise packs.">
+  <main class="container section">
+    <div class="about-content">
+      <h1>About Prompts & Skills</h1>
+
+      <p class="lead">
+        We build practical, ready-to-use resources for developers working with AI.
+        No fluff, no hype — just prompts, skills, and patterns that work.
+      </p>
+
+      <h2>Our Mission</h2>
+      <p>
+        AI tools are powerful, but getting reliable results requires well-crafted prompts
+        and solid engineering patterns. Prompts & Skills is a free, open resource library
+        that helps developers at every level get more out of AI — from writing their first
+        prompt to deploying production agent systems.
+      </p>
+
+      <h2>What We Offer</h2>
+
+      <div class="categories-grid">
+        <div class="category-card">
+          <h3>Prompts</h3>
+          <p>
+            Ready-to-use prompt templates for code review, debugging, API design,
+            and more. Copy, paste, customize, and get better results from any LLM.
+          </p>
+        </div>
+
+        <div class="category-card">
+          <h3>Skills</h3>
+          <p>
+            Technical guides that teach you specific AI development skills — from
+            prompt engineering fundamentals to building MCP servers.
+          </p>
+        </div>
+
+        <div class="category-card">
+          <h3>Agents</h3>
+          <p>
+            Templates and patterns for building AI agents that automate real workflows:
+            research, code review, data processing, and more.
+          </p>
+        </div>
+
+        <div class="category-card">
+          <h3>Guides</h3>
+          <p>
+            Step-by-step tutorials for getting started with AI-assisted development.
+            Beginner-friendly, practical, and focused on real projects.
+          </p>
+        </div>
+
+        <div class="category-card">
+          <h3>Enterprise</h3>
+          <p>
+            Curated skill packs for teams — customer support, DevOps, content creation,
+            and more. Deploy AI across your organization with battle-tested workflows.
+          </p>
+        </div>
+      </div>
+
+      <h2>Start Exploring</h2>
+      <p>
+        Every piece of content is written to be immediately useful. Pick a category
+        that matches what you are working on, grab a prompt or template, and start
+        building.
+      </p>
+      <div class="cta-links">
+        <a href="/prompts/" class="cta-link">Browse Prompts</a>
+        <a href="/skills/" class="cta-link">Learn Skills</a>
+        <a href="/agents/" class="cta-link">Explore Agents</a>
+        <a href="/guides/" class="cta-link">Read Guides</a>
+        <a href="/enterprise/" class="cta-link">Enterprise Packs</a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .about-content {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .lead {
+    font-size: 1.25rem;
+    color: var(--text-secondary, #a1a1aa);
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary, #e4e4e7);
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-green, #00ff88);
+  }
+
+  p {
+    color: var(--text-secondary, #a1a1aa);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .category-card {
+    background: var(--surface, #12121a);
+    border: 1px solid var(--border, #1e1e2e);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .category-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-primary, #e4e4e7);
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .category-card p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+
+  .cta-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .cta-link {
+    display: inline-block;
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    border: 1px solid var(--accent-green, #00ff88);
+    color: var(--accent-green, #00ff88);
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .cta-link:hover {
+    background: var(--accent-green, #00ff88);
+    color: var(--bg, #0a0a0f);
+  }
+</style>
