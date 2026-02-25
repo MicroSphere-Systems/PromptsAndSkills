@@ -4,7 +4,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://promptandskills.com',
+  site: 'https://microsphere-systems.github.io',
+  base: '/PromptsAndSkills',
   integrations: [sitemap()],
   markdown: {
     shikiConfig: {

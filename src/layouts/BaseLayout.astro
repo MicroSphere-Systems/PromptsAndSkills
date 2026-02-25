@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description?: string;
@@ -48,8 +50,7 @@ const pageTitle = `${title} — Prompts & Skills`;
       rel="stylesheet"
     />
 
-    <!-- Global Styles -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
+    <!-- Global Styles loaded via frontmatter import -->
 
     <!-- Google AdSense placeholder — replace data-ad-client with real ID -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
